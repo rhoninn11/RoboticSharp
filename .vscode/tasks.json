@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/SRDE.csproj"
+                "${workspaceFolder}/RoboticSharp.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
