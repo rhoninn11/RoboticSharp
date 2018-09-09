@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 public class MacierzT
@@ -14,6 +16,24 @@ public class MacierzT
                 data[i,j] = new Symbol(0);
             }
         }
+    }
+
+    public MacierzT(Symbol theta_i, Symbol alpha_i_minus_1) //na przysz�o�� �eby mo�na by�o te� tworzy� macierz rotacji
+    {
+        data = new Symbol[3,3];
+
+        data[0, 0] = Symbol.Cos(theta_i);
+        data[0, 1] = -Symbol.Sin(theta_i);
+        data[0, 2] = new Symbol(0)
+        
+        data[1, 0] = Symbol.Sin(theta_i) * Symbol.Cos(theta_i);
+        data[1, 1] = Symbol.Cos(theta_i) * Symbol.Cos(theta_i);
+        data[1, 2] = Symbol.Sin(theta_i);
+        
+        data[2, 0] = Symbol.Sin(theta_i) * Symbol.Sin(theta_i);
+        data[2, 1] = Symbol.Cos(theta_i) * Symbol.Sin(theta_i);
+        data[2, 2] = Symbol.Cos(theta_i);
+
     }
     public MacierzT(Symbol theta_i, Symbol alpha_i_minus_1, Symbol a_i_minus_1, Symbol d_i)
     {
@@ -41,15 +61,58 @@ public class MacierzT
         data[3, 0] = new Symbol(0);;
         data[3, 1] = new Symbol(0);;
         data[3, 2] = new Symbol(0);;
-        data[3, 3] = new Symbol(0);;
+        data[3, 3] = new Symbol(1);;
     }
 
+    public MacierzT TranspozycjaMacierzT()
+    {
+        MacierzT macierzTransponowana = new MacierzT();
+        int size = this.data.GetLength(0);
+        for (int wiersz = 0; wiersz < size; wiersz++)
+        {
+            for (int kolumna = 0;  kolumna < size; kolumna++)
+            {
+                macierzTransponowana.data[kolumna, wiersz] = this.data[wiersz, kolumna];
+            }
+        }
+        return macierzTransponowana;
+    }
+
+    public MacierzT MacierzT0_4(MacierzT[] od0do4)
+    {
+        return od0do4[0] * od0do4[1] * od0do4[2] * od0do4[3];
+    }
+
+    /// <summary>
+    /// Macierz * wektor
+    /// </summary>
+    public static List<double> operator *(MacierzT m, List<double> v)
+    {
+        List<double> vector = new List<double>();
+        int size = m.data.GetLength(0);
+        double element;
+        for (int i = 0; i < size; i++)
+        {
+            element = 0;
+            for (int j = 0; j < size; j++)
+            {
+                element += m.data[size, j] * v[j];
+            }
+            vector.Add(element);
+        }
+        return vector;
+    }
+
+    /// <summary>
+    /// Macierz * macierz
+    /// </summary>
     public static MacierzT operator *(MacierzT m1, MacierzT m2)
     {
         MacierzT resultMatrix = new MacierzT();
-        for (int wiersz = 0; wiersz < 4; wiersz++)
+        int size = m1.data.GetLength(0);
+        for (int wiersz = 0; wiersz < size; wiersz++)
         {
-            for (int kolumna = 0; kolumna < 4; kolumna++)
+            for (int kolumna = 0; kolumna < size; kolumna++)
             {
                 for (int i=0; i < 4; i++)
                 {
@@ -58,7 +121,6 @@ public class MacierzT
             }
         }
         return resultMatrix;
-
     }
 
     public override String ToString()
