@@ -39,6 +39,20 @@ public class MacierzT
         data[3, 3] = 1;
     }
 
+    public MacierzT TranspozycjaMacierzT()
+    {
+        MacierzT macierzOdwrotna = new MacierzT();
+
+        for (int wiersz = 0; wiersz < 4; wiersz++)
+        {
+            for (int kolumna = 0; kolumna < 4; kolumna++)
+            {
+                macierzOdwrotna.data[kolumna, wiersz] = this.data[wiersz, kolumna];
+            }
+        }
+        return macierzOdwrotna;
+    }
+
     public static MacierzT operator *(MacierzT m1, MacierzT m2)
     {
         MacierzT resultMatrix = new MacierzT();
