@@ -13,26 +13,26 @@ public class MacierzT
         {
             for (int j = 0; j < 4; j++)
             {
-                data[i,j] = new Symbol(0);
+                data[i, j] = new Symbol(0);
             }
         }
     }
 
     public MacierzT(Symbol theta_i, Symbol alpha_i_minus_1) //na przysz�o�� �eby mo�na by�o te� tworzy� macierz rotacji
     {
-        data = new Symbol[3,3];
+        data = new Symbol[3, 3];
 
         data[0, 0] = Symbol.Cos(theta_i);
         data[0, 1] = -Symbol.Sin(theta_i);
-        data[0, 2] = new Symbol(0)
-        
-        data[1, 0] = Symbol.Sin(theta_i) * Symbol.Cos(theta_i);
-        data[1, 1] = Symbol.Cos(theta_i) * Symbol.Cos(theta_i);
-        data[1, 2] = Symbol.Sin(theta_i);
-        
-        data[2, 0] = Symbol.Sin(theta_i) * Symbol.Sin(theta_i);
-        data[2, 1] = Symbol.Cos(theta_i) * Symbol.Sin(theta_i);
-        data[2, 2] = Symbol.Cos(theta_i);
+        data[0, 2] = new Symbol(0);
+
+        data[1, 0] = Symbol.Sin(theta_i) * Symbol.Cos(alpha_i_minus_1);
+        data[1, 1] = Symbol.Cos(theta_i) * Symbol.Cos(alpha_i_minus_1);
+        data[1, 2] = Symbol.Sin(alpha_i_minus_1);
+
+        data[2, 0] = Symbol.Sin(theta_i) * Symbol.Sin(alpha_i_minus_1);
+        data[2, 1] = Symbol.Cos(theta_i) * Symbol.Sin(alpha_i_minus_1);
+        data[2, 2] = Symbol.Cos(alpha_i_minus_1);
 
     }
     public MacierzT(Symbol theta_i, Symbol alpha_i_minus_1, Symbol a_i_minus_1, Symbol d_i)
@@ -46,22 +46,22 @@ public class MacierzT
         data[0, 3] = a_i_minus_1;
 
         //drugi wiersz
-        data[1, 0] = Symbol.Sin(theta_i) * Symbol.Cos(theta_i);
-        data[1, 1] = Symbol.Cos(theta_i) * Symbol.Cos(theta_i);
-        data[1, 2] = Symbol.Sin(theta_i);
-        data[1, 3] = d_i * Symbol.Sin(theta_i);
+        data[1, 0] = Symbol.Sin(theta_i) * Symbol.Cos(alpha_i_minus_1);
+        data[1, 1] = Symbol.Cos(theta_i) * Symbol.Cos(alpha_i_minus_1);
+        data[1, 2] = Symbol.Sin(alpha_i_minus_1);
+        data[1, 3] = d_i * Symbol.Sin(alpha_i_minus_1);
 
         //trzeci wiersz
-        data[2, 0] = Symbol.Sin(theta_i) * Symbol.Sin(theta_i);
-        data[2, 1] = Symbol.Cos(theta_i) * Symbol.Sin(theta_i);
-        data[2, 2] = Symbol.Cos(theta_i);
-        data[2, 3] = d_i * Symbol.Cos(theta_i);
+        data[2, 0] = Symbol.Sin(theta_i) * Symbol.Sin(alpha_i_minus_1);
+        data[2, 1] = Symbol.Cos(theta_i) * Symbol.Sin(alpha_i_minus_1);
+        data[2, 2] = Symbol.Cos(alpha_i_minus_1);
+        data[2, 3] = d_i * Symbol.Cos(alpha_i_minus_1);
 
         //czwarty wiersz
-        data[3, 0] = new Symbol(0);;
-        data[3, 1] = new Symbol(0);;
-        data[3, 2] = new Symbol(0);;
-        data[3, 3] = new Symbol(1);;
+        data[3, 0] = new Symbol(0); ;
+        data[3, 1] = new Symbol(0); ;
+        data[3, 2] = new Symbol(0); ;
+        data[3, 3] = new Symbol(1); ;
     }
 
     public MacierzT TranspozycjaMacierzT()
@@ -70,7 +70,7 @@ public class MacierzT
         int size = this.data.GetLength(0);
         for (int wiersz = 0; wiersz < size; wiersz++)
         {
-            for (int kolumna = 0;  kolumna < size; kolumna++)
+            for (int kolumna = 0; kolumna < size; kolumna++)
             {
                 macierzTransponowana.data[kolumna, wiersz] = this.data[wiersz, kolumna];
             }
@@ -96,7 +96,7 @@ public class MacierzT
             element = 0;
             for (int j = 0; j < size; j++)
             {
-                element += m.data[size, j] * v[j];
+                //element += m.data[size, j] * v[j]; // vektor też będzie musiał się składać z symboli
             }
             vector.Add(element);
         }
@@ -114,9 +114,9 @@ public class MacierzT
         {
             for (int kolumna = 0; kolumna < size; kolumna++)
             {
-                for (int i=0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                 {
-                    resultMatrix.data[wiersz, kolumna] += m1.data[wiersz, i]*m2.data[i, kolumna];
+                    resultMatrix.data[wiersz, kolumna] += m1.data[wiersz, i] * m2.data[i, kolumna];
                 }
             }
         }
