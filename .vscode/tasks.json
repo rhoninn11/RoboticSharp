@@ -10,6 +10,18 @@
                 "${workspaceFolder}/RoboticSharp.App/RoboticSharp.App.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/RoboticSharp.Test/RoboticSharp.Test.csproj"
+            ],
+            "problemMatcher": [
+                "$msCompile"
+            ]
         }
     ]
 }
