@@ -15,17 +15,17 @@ namespace RoboticSharp.App
         SymbolType type;
         SymbolPolarity polarity;
 
-        enum SymbolOperator
+        public enum SymbolOperator
         {
             none, plus, minus, times, sin, cos
         }
 
-        enum SymbolType
+        public enum SymbolType
         {
             text, numerical, node
         }
 
-        enum SymbolPolarity
+        public enum SymbolPolarity
         {
             positive, negative
         }
@@ -47,13 +47,20 @@ namespace RoboticSharp.App
         {
             type = SymbolType.text;
             textValue = value;
-        }               
+        }
+
+        public Symbol(List<Symbol> subSymbols, SymbolOperator operation) : this()
+        {
+            this.subSymbols = subSymbols;
+            this.operation = operation;
+            this.type = SymbolType.node;
+        }
 
         public static Symbol operator +(Symbol s1, Symbol s2)
         {
             Symbol symbol = new Symbol();
             symbol.operation = SymbolOperator.plus;
-            
+
             if (bothAreNumerical(s1, s2))
             {
                 symbol.type = SymbolType.numerical;
@@ -64,7 +71,7 @@ namespace RoboticSharp.App
                 symbol.type = SymbolType.node;
                 Symbol noded = getNodedFrom(s1, s2);
                 Symbol notNoded = getNotNodedFrom(s1, s2);
-                
+
                 if (noded.isOperatorTypeOf(SymbolOperator.plus))
                     symbol.subSymbols = noded.stackSubsymbolsWith(noded);
                 else
@@ -127,19 +134,19 @@ namespace RoboticSharp.App
         {
             Symbol symbol = new Symbol();
             symbol.operation = SymbolOperator.times;
-            
-            if (bothAreNumerical(s1,s2))
+
+            if (bothAreNumerical(s1, s2))
             {
                 symbol.type = SymbolType.numerical;
                 symbol.numericValue = s1.numericValue * s2.numericValue;
             }
 
-            else if (oneOfThemIsNode(s1,s2))
+            else if (oneOfThemIsNode(s1, s2))
             {
                 Symbol noded = getNodedFrom(s1, s2);
                 Symbol notNoded = getNotNodedFrom(s1, s2);
-                symbol.type = SymbolType.node;                
-                
+                symbol.type = SymbolType.node;
+
                 if (noded.isOperatorTypeOf(SymbolOperator.times))
                     symbol.subSymbols = noded.stackSubsymbolsWith(noded);
                 else //smieszna konstrukcja
@@ -202,7 +209,7 @@ namespace RoboticSharp.App
                     }
                     symbol.subSymbols.RemoveAll(s => s.isNumerical() && s.numericValue == 1);
                     break;
-                  
+
             }
         }
 
@@ -247,24 +254,45 @@ namespace RoboticSharp.App
             return stringBuilder.ToString().Replace("+-", "-");
         }
 
-        public override bool Equals(object obj){
+        public override bool Equals(object obj)
+        {
             Symbol comparedSymbol = (Symbol)obj;
 
-            bool typeCondition = IsTheSameTypeSymbols(this,comparedSymbol);
-            bool valueCondition = IsTheSameValueSymbol(this,comparedSymbol);
+            bool typeCondition = IsTheSameTypeSymbols(this, comparedSymbol);
+            bool valueCondition = IsTheSameValueSymbol(this, comparedSymbol);
+            bool nodeCondition = true;
 
-            return typeCondition && valueCondition;
+            if (this.isNode() && typeCondition)
+                nodeCondition = NodesEquality(this, comparedSymbol);
+
+            return typeCondition && valueCondition && nodeCondition;
         }
 
-        private bool IsTheSameTypeSymbols(Symbol s1, Symbol s2){
+        private bool IsTheSameTypeSymbols(Symbol s1, Symbol s2)
+        {
             return s1.type == s2.type;
         }
 
-        private bool IsTheSameValueSymbol(Symbol s1, Symbol s2){
+        private bool IsTheSameValueSymbol(Symbol s1, Symbol s2)
+        {
             bool isNumericalValueTheSame = s1.numericValue == s2.numericValue;
             bool isTextValueTheSame = s1.textValue == s2.textValue;
-            
+
             return isNumericalValueTheSame && isTextValueTheSame;
+        }
+
+        private bool NodesEquality(Symbol s1, Symbol s2)
+        {
+            bool isNodesEqual = false;
+            if (!s1.isOperatorTypeOf(s2.operation))
+                return false;
+
+            if (s1.subSymbols.Count == s2.subSymbols.Count)
+                for (int i = 0; i < s1.subSymbols.Count; i++)
+                    if (!(isNodesEqual = s1.subSymbols[i].Equals(s2.subSymbols[i])))
+                        break;
+
+            return isNodesEqual;
         }
 
 
