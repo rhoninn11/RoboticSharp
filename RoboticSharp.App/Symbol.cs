@@ -204,12 +204,7 @@ namespace RoboticSharp.App
                         symbol.numericValue = 0;
                     }
                     symbol.subSymbols.RemoveAll(s => s.isNumerical() && s.numericValue == 1);
-<<<<<<< HEAD
-                    break;
-
-=======
                     break;                  
->>>>>>> 8a820479c3462cedd6ec3b623c6dab77c87f5122
             }
         }
 
