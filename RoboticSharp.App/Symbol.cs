@@ -245,6 +245,27 @@ namespace RoboticSharp.App
             return stringBuilder.ToString().Replace("+-", "-");
         }
 
+        public override bool Equals(object obj){
+            Symbol comparedSymbol = (Symbol)obj;
+
+            bool typeCondition = IsTheSameTypeSymbols(this,comparedSymbol);
+            bool valueCondition = IsTheSameValueSymbol(this,comparedSymbol);
+
+            return typeCondition && valueCondition;
+        }
+
+        private bool IsTheSameTypeSymbols(Symbol s1, Symbol s2){
+            return s1.type == s2.type;
+        }
+
+        private bool IsTheSameValueSymbol(Symbol s1, Symbol s2){
+            bool isNumericalValueTheSame = s1.numericValue == s2.numericValue;
+            bool isTextValueTheSame = s1.textValue == s2.textValue;
+            
+            return isNumericalValueTheSame && isTextValueTheSame;
+        }
+
+
         public static Symbol Sin(Symbol value)
         {
             Symbol symbol = new Symbol();

@@ -7,7 +7,7 @@ namespace RoboticSharp.App.Matrices
 {
     public class MacierzT
     {
-        Symbol[,] data;
+        Symbol[,] data; // pierwszy indeks jest wierszem
         public MacierzT()
         {
             data = new Symbol[4, 4];
