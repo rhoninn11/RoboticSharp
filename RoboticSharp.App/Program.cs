@@ -1,6 +1,7 @@
 ﻿using System;
+using RoboticSharp.App.Matrices;
 
-namespace RoboticSharp
+namespace RoboticSharp.App
 {
     class Program
     {
