@@ -105,17 +105,14 @@ namespace RoboticSharp.App
         {
             return this.type == SymbolType.numerical;
         }
-
         public bool isNode()
         {
             return this.type == SymbolType.node;
         }
-
         public static bool oneOfThemIsNode(Symbol s1, Symbol s2)
         {
             return s1.isNode() && !s2.isNode() || !s1.isNode() && s2.isNode();
         }
-
         public static bool bothAreNumerical(Symbol s1, Symbol s2)
         {
             return s1.isNumerical() && s2.isNumerical();
@@ -129,7 +126,6 @@ namespace RoboticSharp.App
         {
             return operation == operat;
         }
-
         public static Symbol operator *(Symbol s1, Symbol s2)
         {
             Symbol symbol = new Symbol();
@@ -149,7 +145,7 @@ namespace RoboticSharp.App
 
                 if (noded.isOperatorTypeOf(SymbolOperator.times))
                     symbol.subSymbols = noded.stackSubsymbolsWith(noded);
-                else //smieszna konstrukcja
+                else 
                     for (int i = 0; i < noded.subSymbols.Count; i++)
                         symbol.subSymbols.Add(noded.subSymbols[i] * notNoded);
             }
@@ -208,8 +204,12 @@ namespace RoboticSharp.App
                         symbol.numericValue = 0;
                     }
                     symbol.subSymbols.RemoveAll(s => s.isNumerical() && s.numericValue == 1);
+<<<<<<< HEAD
                     break;
 
+=======
+                    break;                  
+>>>>>>> 8a820479c3462cedd6ec3b623c6dab77c87f5122
             }
         }
 
@@ -296,35 +296,29 @@ namespace RoboticSharp.App
         }
 
 
-        public static Symbol Sin(Symbol value)
+        public static Symbol Sin(Symbol symbol)
         {
-            Symbol symbol = new Symbol();
-            symbol.type = value.type;
-
-            switch (value.type)
+            switch (symbol.type)
             {
                 case SymbolType.text:
-                    symbol.textValue = String.Format("S{0}", value.textValue);
+                    symbol.textValue = String.Format("S{0}", symbol.textValue);
                     break;
                 case SymbolType.numerical:
-                    symbol.numericValue = RoundForTrygonometryBorderValues(Math.Sin((Math.PI / 180) * value.numericValue));
+                    symbol.numericValue = RoundForTrygonometryBorderValues(Math.Sin((Math.PI / 180) * symbol.numericValue));
                     break;
             }
             return symbol;
         }
 
-        public static Symbol Cos(Symbol value)
+        public static Symbol Cos(Symbol symbol)
         {
-            Symbol symbol = new Symbol();
-            symbol.type = value.type;
-
-            switch (value.type)
+            switch (symbol.type)
             {
                 case SymbolType.text:
-                    symbol.textValue = String.Format("C{0}", value.textValue);
+                    symbol.textValue = String.Format("C{0}", symbol.textValue);
                     break;
                 case SymbolType.numerical:
-                    symbol.numericValue = RoundForTrygonometryBorderValues(Math.Cos((Math.PI / 180) * value.numericValue));
+                    symbol.numericValue = RoundForTrygonometryBorderValues(Math.Cos((Math.PI / 180) * symbol.numericValue));
                     break;
             }
             return symbol;
