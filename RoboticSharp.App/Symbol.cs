@@ -253,14 +253,14 @@ namespace RoboticSharp.App
         {
             Symbol comparedSymbol = (Symbol)obj;
 
-            bool typeCondition = IsTheSameTypeSymbols(this, comparedSymbol);
+            bool isTheSameType = IsTheSameTypeSymbols(this, comparedSymbol);
             bool valueCondition = IsTheSameValueSymbol(this, comparedSymbol);
             bool nodeCondition = true;
 
-            if (this.isNode() && typeCondition)
+            if (this.isNode() && isTheSameType)
                 nodeCondition = NodesEquality(this, comparedSymbol);
 
-            return typeCondition && valueCondition && nodeCondition;
+            return isTheSameType && valueCondition && nodeCondition;
         }
 
         private bool IsTheSameTypeSymbols(Symbol s1, Symbol s2)

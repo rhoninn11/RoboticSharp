@@ -13,6 +13,15 @@ namespace RoboticSharp.Test
 
         }
 
+        [Fact]
+        public void SymbolAdditionTest()
+        {
+            Symbol s1 = new Symbol(4);
+            Symbol s2 = new Symbol(5);
+            Symbol result = s1 + s2;
+            Assert.Equal("9,0000", result.ToString());
+        }
+
         [Theory]
         [MemberData(nameof(SymbolEqualityTheoryData))]
         public void SymbolEqualityTheory(Symbol a, Symbol b, bool c)
@@ -50,5 +59,6 @@ namespace RoboticSharp.Test
                 new object[]{ new Symbol(new List<Symbol>(){new Symbol(1),new Symbol(2),new Symbol(3)},Symbol.SymbolOperator.times),new Symbol(new List<Symbol>(){new Symbol(1),new Symbol(2),new Symbol(3)},Symbol.SymbolOperator.times),true}
             };
         }
+
     }
 }
