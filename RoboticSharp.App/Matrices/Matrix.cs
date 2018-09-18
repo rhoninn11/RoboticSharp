@@ -5,10 +5,10 @@ using System.Text;
 
 namespace RoboticSharp.App.Matrices
 {
-    public class MacierzT
+    public class Matrix
     {
         Symbol[,] data; // pierwszy indeks jest wierszem
-        public MacierzT()
+        public Matrix()
         {
             data = new Symbol[4, 4];
             for (int i = 0; i < 4; i++)
@@ -20,7 +20,7 @@ namespace RoboticSharp.App.Matrices
             }
         }
 
-        public MacierzT(Symbol theta_i, Symbol alpha_i_minus_1) //na przysz�o�� �eby mo�na by�o te� tworzy� macierz rotacji
+        public Matrix(Symbol theta_i, Symbol alpha_i_minus_1) //na przysz�o�� �eby mo�na by�o te� tworzy� macierz rotacji
         {
             data = new Symbol[3, 3];
 
@@ -37,7 +37,7 @@ namespace RoboticSharp.App.Matrices
             data[2, 2] = Symbol.Cos(alpha_i_minus_1);
 
         }
-        public MacierzT(Symbol theta_i, Symbol alpha_i_minus_1, Symbol a_i_minus_1, Symbol d_i)
+        public Matrix(Symbol theta_i, Symbol alpha_i_minus_1, Symbol a_i_minus_1, Symbol d_i)
         {
             data = new Symbol[4, 4];
 
@@ -66,9 +66,9 @@ namespace RoboticSharp.App.Matrices
             data[3, 3] = new Symbol(1); ;
         }
 
-        public MacierzT TranspozycjaMacierzT()
+        public Matrix TranspozycjaMacierz()
         {
-            MacierzT macierzTransponowana = new MacierzT();
+            Matrix macierzTransponowana = new Matrix();
             int size = this.data.GetLength(0);
             for (int wiersz = 0; wiersz < size; wiersz++)
             {
@@ -80,7 +80,7 @@ namespace RoboticSharp.App.Matrices
             return macierzTransponowana;
         }
 
-        public MacierzT MacierzT0_4(MacierzT[] od0do4)
+        public Matrix MacierzT0_4(Matrix[] od0do4)
         {
             return od0do4[0] * od0do4[1] * od0do4[2] * od0do4[3];
         }
@@ -88,7 +88,7 @@ namespace RoboticSharp.App.Matrices
         /// <summary>
         /// Macierz * wektor
         /// </summary>
-        public static List<double> operator *(MacierzT m, List<double> v)
+        public static List<double> operator *(Matrix m, List<double> v)
         {
             List<double> vector = new List<double>();
             int size = m.data.GetLength(0);
@@ -108,9 +108,9 @@ namespace RoboticSharp.App.Matrices
         /// <summary>
         /// Macierz * macierz
         /// </summary>
-        public static MacierzT operator *(MacierzT m1, MacierzT m2)
+        public static Matrix operator *(Matrix m1, Matrix m2)
         {
-            MacierzT resultMatrix = new MacierzT();
+            Matrix resultMatrix = new Matrix();
             int size = m1.data.GetLength(0);
             for (int wiersz = 0; wiersz < size; wiersz++)
             {

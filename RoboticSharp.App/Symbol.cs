@@ -123,7 +123,7 @@ namespace RoboticSharp.App
             foreach(var symbol in this.subSymbols)
                 stackedSubSymbols.Add(symbol);
             stackedSubSymbols.Add(notNoded);
-            //subSymbols.Add(notNoded);// to rozwiązanie działą prawidłowo z powdu referencyjnego typu: modyfikuje poprzedni symbol
+            //subSymbols.Add(notNoded);// to rozwiązanie działą prawidłowo z powdu referencyjnego typu: modyfikuje poprzedni symbol 
             return stackedSubSymbols;
         }
         bool isOperatorTypeOf(SymbolOperator operat)
