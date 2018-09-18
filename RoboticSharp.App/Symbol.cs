@@ -73,7 +73,7 @@ namespace RoboticSharp.App
                 Symbol notNoded = getNotNodedFrom(s1, s2);
 
                 if (noded.isOperatorTypeOf(SymbolOperator.plus))
-                    symbol.subSymbols = noded.stackSubsymbolsWith(noded);
+                    symbol.subSymbols = noded.stackSubsymbolsWith(notNoded);
                 else
                     for (int i = 0; i < noded.subSymbols.Count; i++)
                         symbol.subSymbols.Add(noded.subSymbols[i] + notNoded);
@@ -119,8 +119,12 @@ namespace RoboticSharp.App
         }
         public List<Symbol> stackSubsymbolsWith(Symbol notNoded) // można wymyślić jakąś ładniejszą nazwę która by więcej mówiła o tym
         {
-            subSymbols.Add(notNoded);
-            return subSymbols;
+            List<Symbol> stackedSubSymbols = new List<Symbol>();
+            foreach(var symbol in this.subSymbols)
+                stackedSubSymbols.Add(symbol);
+            stackedSubSymbols.Add(notNoded);
+            //subSymbols.Add(notNoded);// to rozwiązanie działą prawidłowo z powdu referencyjnego typu: modyfikuje poprzedni symbol
+            return stackedSubSymbols;
         }
         bool isOperatorTypeOf(SymbolOperator operat)
         {
@@ -144,8 +148,8 @@ namespace RoboticSharp.App
                 symbol.type = SymbolType.node;
 
                 if (noded.isOperatorTypeOf(SymbolOperator.times))
-                    symbol.subSymbols = noded.stackSubsymbolsWith(noded);
-                else 
+                    symbol.subSymbols = noded.stackSubsymbolsWith(notNoded);
+                else
                     for (int i = 0; i < noded.subSymbols.Count; i++)
                         symbol.subSymbols.Add(noded.subSymbols[i] * notNoded);
             }
@@ -204,7 +208,7 @@ namespace RoboticSharp.App
                         symbol.numericValue = 0;
                     }
                     symbol.subSymbols.RemoveAll(s => s.isNumerical() && s.numericValue == 1);
-                    break;                  
+                    break;
             }
         }
 
@@ -272,8 +276,9 @@ namespace RoboticSharp.App
         {
             bool isNumericalValueTheSame = s1.numericValue == s2.numericValue;
             bool isTextValueTheSame = s1.textValue == s2.textValue;
+            bool isPolarityTheSame = s1.polarity == s2.polarity;
 
-            return isNumericalValueTheSame && isTextValueTheSame;
+            return isNumericalValueTheSame && isTextValueTheSame && isPolarityTheSame;
         }
 
         private bool NodesEquality(Symbol s1, Symbol s2)
@@ -291,29 +296,35 @@ namespace RoboticSharp.App
         }
 
 
-        public static Symbol Sin(Symbol symbol)
+        public static Symbol Sin(Symbol input)
         {
+            Symbol symbol = new Symbol();
+            symbol.type = input.type;
+
             switch (symbol.type)
             {
                 case SymbolType.text:
-                    symbol.textValue = String.Format("S{0}", symbol.textValue);
+                    symbol.textValue = String.Format("S{0}", input.textValue);
                     break;
                 case SymbolType.numerical:
-                    symbol.numericValue = RoundForTrygonometryBorderValues(Math.Sin((Math.PI / 180) * symbol.numericValue));
+                    symbol.numericValue = RoundForTrygonometryBorderValues(Math.Sin((Math.PI / 180) * input.numericValue));
                     break;
             }
             return symbol;
         }
 
-        public static Symbol Cos(Symbol symbol)
+        public static Symbol Cos(Symbol input)
         {
+            Symbol symbol = new Symbol();
+            symbol.type = input.type;
+
             switch (symbol.type)
             {
                 case SymbolType.text:
-                    symbol.textValue = String.Format("C{0}", symbol.textValue);
+                    symbol.textValue = String.Format("C{0}", input.textValue);
                     break;
                 case SymbolType.numerical:
-                    symbol.numericValue = RoundForTrygonometryBorderValues(Math.Cos((Math.PI / 180) * symbol.numericValue));
+                    symbol.numericValue = RoundForTrygonometryBorderValues(Math.Cos((Math.PI / 180) * input.numericValue));
                     break;
             }
             return symbol;
