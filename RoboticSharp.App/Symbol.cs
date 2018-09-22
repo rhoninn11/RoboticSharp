@@ -61,12 +61,12 @@ namespace RoboticSharp.App
             Symbol symbol = new Symbol();
             symbol.operation = SymbolOperator.plus;
 
-            if (bothAreNumerical(s1, s2))
+            if (areBothANumerical(s1, s2))
             {
                 symbol.type = SymbolType.numerical;
                 symbol.numericValue = s1.numericValue + s2.numericValue;
             }
-            else if (oneOfThemIsNode(s1, s2))
+            else if (isOneOfThemANode(s1, s2))
             {
                 symbol.type = SymbolType.node;
                 Symbol noded = getNodedFrom(s1, s2);
@@ -80,15 +80,47 @@ namespace RoboticSharp.App
                     symbol.subSymbols.Add(s2);
                 }
             }
-            else
+            else if (areBothANode(s1, s2))
+                mergeNodeSymbolsToOne(s1, s2, ref symbol, SymbolOperator.plus);
+            else if (!areBothANumerical(s1, s2) && !isOneOfThemANode(s1, s2))
             {
                 symbol.type = SymbolType.node;
                 symbol.subSymbols.Add(s1);
                 symbol.subSymbols.Add(s2);
             }
-            ClearNode(symbol);
+            clearNode(ref symbol);
             SortNode(symbol);
             return symbol;
+        }
+
+        private static void mergeNodeSymbolsToOne(Symbol s1, Symbol s2, ref Symbol symbol, SymbolOperator operation)
+        {
+            symbol.type = SymbolType.node;
+            if (s1.isOperatorTypeOf(s2.operation))
+            {
+                if (s1.isOperatorTypeOf(operation))
+                {
+                    symbol.absorbeSubSymbols(s1);
+                    symbol.absorbeSubSymbols(s2);
+                }
+                else if (!s1.isOperatorTypeOf(operation))
+                {
+                    symbol.subSymbols.Add(s1);
+                    symbol.subSymbols.Add(s2);
+                }
+            }
+            else if (s1.isOperatorTypeOf(symbol.operation))
+                symbol.subSymbols = s1.stackSubsymbolsWith(s2);
+            else if (s2.isOperatorTypeOf(symbol.operation))
+                symbol.subSymbols = s2.stackSubsymbolsWith(s1);
+        }
+
+        private void absorbeSubSymbols(Symbol s1)
+        {
+            foreach (var symbol in s1.subSymbols)
+            {
+                this.subSymbols.Add(symbol);
+            }
         }
 
         public static Symbol operator -(Symbol s1, Symbol s2)
@@ -96,12 +128,12 @@ namespace RoboticSharp.App
             Symbol symbol = new Symbol();
             symbol.operation = SymbolOperator.plus;
 
-            if(bothAreNumerical(s1, s2))
+            if (areBothANumerical(s1, s2))
             {
                 symbol.type = SymbolType.numerical;
                 symbol.numericValue = s1.numericValue - s2.numericValue;
             }
-            else if(oneOfThemIsNode(s1, s2))
+            else if (isOneOfThemANode(s1, s2))
             {
                 symbol.type = SymbolType.node;
                 Symbol noded = getNodedFrom(s1, s2);
@@ -126,26 +158,12 @@ namespace RoboticSharp.App
             else
                 return s2;
         }
-        public bool isNumerical()
-        {
-            return this.type == SymbolType.numerical;
-        }
-        public bool isText()
-        {
-            return this.type == SymbolType.text;
-        }
-        public bool isNode()
-        {
-            return this.type == SymbolType.node;
-        }
-        public static bool oneOfThemIsNode(Symbol s1, Symbol s2)
-        {
-            return s1.isNode() && !s2.isNode() || !s1.isNode() && s2.isNode();
-        }
-        public static bool bothAreNumerical(Symbol s1, Symbol s2)
-        {
-            return s1.isNumerical() && s2.isNumerical();
-        }
+        public bool isNumerical() { return this.type == SymbolType.numerical; }
+        public bool isText() { return this.type == SymbolType.text; }
+        public bool isNode() { return this.type == SymbolType.node; }
+        public static bool isOneOfThemANode(Symbol s1, Symbol s2) { return s1.isNode() && !s2.isNode() || !s1.isNode() && s2.isNode(); }
+        public static bool areBothANumerical(Symbol s1, Symbol s2) { return s1.isNumerical() && s2.isNumerical(); }
+        public static bool areBothANode(Symbol s1, Symbol s2) { return s1.isNode() && s2.isNode(); }
         public List<Symbol> stackSubsymbolsWith(Symbol notNoded) // można wymyślić jakąś ładniejszą nazwę która by więcej mówiła o tym
         {
             List<Symbol> stackedSubSymbols = new List<Symbol>();
@@ -154,22 +172,19 @@ namespace RoboticSharp.App
             stackedSubSymbols.Add(notNoded);
             return stackedSubSymbols;
         }
-        bool isOperatorTypeOf(SymbolOperator operat)
-        {
-            return operation == operat;
-        }
+        bool isOperatorTypeOf(SymbolOperator opwerator) { return operation == opwerator; }
         public static Symbol operator *(Symbol s1, Symbol s2)
         {
             Symbol symbol = new Symbol();
             symbol.operation = SymbolOperator.times;
 
-            if (bothAreNumerical(s1, s2))
+            if (areBothANumerical(s1, s2))
             {
                 symbol.type = SymbolType.numerical;
                 symbol.numericValue = s1.numericValue * s2.numericValue;
             }
 
-            else if (oneOfThemIsNode(s1, s2))
+            else if (isOneOfThemANode(s1, s2))
             {
                 Symbol noded = getNodedFrom(s1, s2);
                 Symbol notNoded = getNotNodedFrom(s1, s2);
@@ -181,13 +196,15 @@ namespace RoboticSharp.App
                     for (int i = 0; i < noded.subSymbols.Count; i++)
                         symbol.subSymbols.Add(noded.subSymbols[i] * notNoded);
             }
-            else
+            else if (areBothANode(s1, s2))
+                mergeNodeSymbolsToOne(s1, s2, ref symbol, SymbolOperator.times);
+            else if (!areBothANumerical(s1, s2) && !isOneOfThemANode(s1, s2))
             {
                 symbol.type = SymbolType.node;
                 symbol.subSymbols.Add(s1);
                 symbol.subSymbols.Add(s2);
             }
-            ClearNode(symbol);
+            clearNode(ref symbol);
             SortNode(symbol);
             return symbol;
         }
@@ -208,20 +225,51 @@ namespace RoboticSharp.App
                 return s1;
             }
         }
-        bool isPolarityPositive()
-        {
-            return polarity == SymbolPolarity.positive;
-        }
-        bool isPolarityNegative()
-        {
-            return polarity == SymbolPolarity.negative;
-        }
+        bool isPolarityPositive() { return polarity == SymbolPolarity.positive; }
+        bool isPolarityNegative() { return polarity == SymbolPolarity.negative; }
 
-        public static void ClearNode(Symbol symbol)
+        public static void clearNode(ref Symbol symbol)
         {
             if (!symbol.isNode())
                 return;
+            
+            numericalCalculationInside(ref symbol);
+            removeSingularValues(ref symbol);
+        }
+        public static void numericalCalculationInside(ref Symbol symbol)
+        {
+            var numericalValueList = symbol.subSymbols.FindAll(sym => sym.isNumerical());
+            if (numericalValueList.Count == 0 || numericalValueList.Count == 1)
+                return;
+            else if (numericalValueList.Count > 1)
+            {
+                Symbol result = new Symbol();
+                switch (symbol.operation)
+                {
+                    case SymbolOperator.plus:
+                        result = new Symbol(0);
+                        break;
+                    case SymbolOperator.times:
+                        result = new Symbol(1);
+                        break;
+                }
 
+                for (int i = 0; i < numericalValueList.Count; i++)
+                    switch (symbol.operation)
+                    {
+                        case SymbolOperator.plus:
+                            result += numericalValueList[i];
+                            break;
+                        case SymbolOperator.times:
+                            result *= numericalValueList[i];
+                            break;
+                    }
+                symbol.subSymbols.RemoveAll(sym => sym.isNumerical());
+                symbol.subSymbols.Add(result);
+            }
+        }
+        public static void removeSingularValues(ref Symbol symbol)
+        {
             switch (symbol.operation)
             {
                 case SymbolOperator.plus:
@@ -240,9 +288,9 @@ namespace RoboticSharp.App
                     break;
             }
         }
-
         public static void SortNode(Symbol symbol)
         {
+            var numericalSymbol = symbol.subSymbols.FindAll(sym => sym.isNumerical());
             symbol.subSymbols.Sort();
         }
 
@@ -291,22 +339,19 @@ namespace RoboticSharp.App
         {
             Symbol comparedSymbol = (Symbol)obj;
 
-            bool isTheSameType = IsTheSameTypeSymbols(this, comparedSymbol);
-            bool valueCondition = IsTheSameValueSymbol(this, comparedSymbol);
+            bool isTheSameType = areBothHaveTheSameType(this, comparedSymbol);
+            bool valueCondition = areBothHaveTheSameValue(this, comparedSymbol);
             bool nodeCondition = true;
 
             if (this.isNode() && isTheSameType)
-                nodeCondition = NodesEquality(this, comparedSymbol);
+                nodeCondition = areNodesEqual(this, comparedSymbol);
 
             return isTheSameType && valueCondition && nodeCondition;
         }
 
-        private bool IsTheSameTypeSymbols(Symbol s1, Symbol s2)
-        {
-            return s1.type == s2.type;
-        }
+        private bool areBothHaveTheSameType(Symbol s1, Symbol s2) { return s1.type == s2.type; }
 
-        private bool IsTheSameValueSymbol(Symbol s1, Symbol s2)
+        private bool areBothHaveTheSameValue(Symbol s1, Symbol s2)
         {
             bool isNumericalValueTheSame = s1.numericValue == s2.numericValue;
             bool isTextValueTheSame = s1.textValue == s2.textValue;
@@ -315,7 +360,7 @@ namespace RoboticSharp.App
             return isNumericalValueTheSame && isTextValueTheSame && isPolarityTheSame;
         }
 
-        private bool NodesEquality(Symbol s1, Symbol s2)
+        private bool areNodesEqual(Symbol s1, Symbol s2)
         {
             bool isNodesEqual = false;
             if (!s1.isOperatorTypeOf(s2.operation))
@@ -373,21 +418,21 @@ namespace RoboticSharp.App
 
         public int CompareTo(Symbol other)
         {
-            if (this.isNumerical() && !IsTheSameTypeSymbols(this, other))
+            if (this.isNumerical() && !areBothHaveTheSameType(this, other))
                 return -1;
-            else if(other.isNumerical() && !IsTheSameTypeSymbols(this, other))
+            else if (other.isNumerical() && !areBothHaveTheSameType(this, other))
                 return 1;
-            else if (this.isNumerical() && IsTheSameTypeSymbols(this, other))
+            else if (this.isNumerical() && areBothHaveTheSameType(this, other))
                 return this.numericValue.CompareTo(other.numericValue);
 
-            if(this.isText() && !IsTheSameTypeSymbols(this, other))
+            if (this.isText() && !areBothHaveTheSameType(this, other))
                 return -1;
-            else if(other.isText() && !IsTheSameTypeSymbols(this, other))
+            else if (other.isText() && !areBothHaveTheSameType(this, other))
                 return 1;
-            else if (this.isText() && IsTheSameTypeSymbols(this, other))
+            else if (this.isText() && areBothHaveTheSameType(this, other))
                 return this.textValue.CompareTo(other.textValue);
 
-            else if (this.isNode() && IsTheSameValueSymbol(this, other))
+            else if (this.isNode() && areBothHaveTheSameValue(this, other))
                 return this.ToString().Length.CompareTo(other.ToString().Length);
 
             return 0;

@@ -15,23 +15,7 @@ namespace RoboticSharp.Test
             Symbol result = s1 + s2;
             Assert.Equal("9.0000", result.ToString());
         }
-        [Fact]
-        public void NodeSymbolAdditionTest()
-        {
-
-            var nodeA = new Symbol(new List<Symbol>() { new Symbol("a"), new Symbol(12) }, Symbol.SymbolOperator.plus);
-            var symbolB = new Symbol("b");
-            var outputSymbol = new Symbol(new List<Symbol>() { new Symbol(12), new Symbol("a"), new Symbol("b") }, Symbol.SymbolOperator.plus);
-
-            var resultaA = nodeA + symbolB;
-            var resultaB = symbolB + nodeA;
-
-            Assert.True(resultaA.Equals(outputSymbol));
-            Assert.True(resultaB.Equals(outputSymbol));
-        }
-
-
-
+  
         [Theory]
         [MemberData(nameof(SymbolEqualityTheoryData))]
         public void SymbolEqualityTheory(Symbol a, Symbol b, bool c)
@@ -74,33 +58,82 @@ namespace RoboticSharp.Test
         }
 
         [Fact]
-        public void NodeSubSymbolSortingTest()
+        public void NodeSubSymbolSortingForAditionTest()
         {
             //Given
-            var nodeA = new Symbol(new List<Symbol>() { new Symbol("a"), new Symbol(1) }, Symbol.SymbolOperator.times);
-            var nodeB = new Symbol(new List<Symbol>() { new Symbol(2), new Symbol("ab") }, Symbol.SymbolOperator.times);
-            var nodeC = new Symbol("c");
-            var nodeD = new Symbol(12);
+            var symbolA = new Symbol(new List<Symbol>() { new Symbol("a"), new Symbol(1) }, Symbol.SymbolOperator.times);
+            var symbolB = new Symbol(new List<Symbol>() { new Symbol(2), new Symbol("ab") }, Symbol.SymbolOperator.times);
+            var symbolC = new Symbol("c");
+            var symbolD = new Symbol(12);
+            var symbolE = new Symbol(new List<Symbol>() { new Symbol(2), new Symbol("e") }, Symbol.SymbolOperator.plus);
+
 
             var resultNode = new Symbol(new List<Symbol>(){
-                    new Symbol(12),
+                    new Symbol(14),
                     new Symbol("c"),
+                    new Symbol("e"),
                     new Symbol(new List<Symbol>(){
-                        new Symbol("a"),
-                        new Symbol(1)
+                        new Symbol(1),
+                        new Symbol("a")
                         },Symbol.SymbolOperator.times),
                     new Symbol(new List<Symbol>(){
                         new Symbol(2),
                         new Symbol("ab")
                         },Symbol.SymbolOperator.times)
                     }, Symbol.SymbolOperator.plus);
-            //When
-            Symbol.SortNode(nodeA);
-            Symbol.SortNode(nodeB);
 
-            var resultA = nodeA + nodeB + nodeC + nodeD;
+            //When
+            Symbol.SortNode(symbolA);
+            Symbol.SortNode(symbolB);
+
+            var resultA = symbolA + symbolC + symbolD + symbolB + symbolE;
+            var resultB = symbolD + symbolC + symbolA + symbolE + symbolB;
+            var resultC = symbolA + symbolB + symbolE + symbolD + symbolC;
+            var resultD = symbolA + symbolE + symbolB + symbolD + symbolC;
 
             //Then
+            Assert.True(resultA.Equals(resultNode));
+            Assert.True(resultB.Equals(resultNode));
+            Assert.True(resultC.Equals(resultNode));
+            Assert.True(resultD.Equals(resultNode));
+        }
+
+        [Fact]
+        public void NodeSubSymbolSortingForMultiplicationTest()
+        {
+        //Given
+            var symbolA = new Symbol(new List<Symbol>() { new Symbol("a"), new Symbol(1) }, Symbol.SymbolOperator.times);
+            var symbolB = new Symbol(new List<Symbol>() { new Symbol(2), new Symbol("ab") }, Symbol.SymbolOperator.times);
+            var symbolC = new Symbol("c");
+            var symbolD = new Symbol(12);
+            var symbolE = new Symbol(new List<Symbol>() { new Symbol(2), new Symbol("e") }, Symbol.SymbolOperator.plus);
+
+
+            var resultNode = new Symbol(new List<Symbol>(){
+                    new Symbol(24),
+                    new Symbol("a"),
+                    new Symbol("ab"),
+                    new Symbol("c"),
+                    new Symbol(new List<Symbol>(){
+                        new Symbol(2),
+                        new Symbol("e")
+                        },Symbol.SymbolOperator.plus)
+                    }, Symbol.SymbolOperator.times);
+
+            //When
+            Symbol.SortNode(symbolA);
+            Symbol.SortNode(symbolB);
+
+            var resultA = symbolA * symbolC * symbolD * symbolB * symbolE;
+            var resultB = symbolD * symbolC * symbolA * symbolE * symbolB;
+            var resultC = symbolA * symbolB * symbolE * symbolD * symbolC;
+            var resultD = symbolA * symbolE * symbolB * symbolD * symbolC;
+
+            //Then
+            Assert.True(resultA.Equals(resultNode));
+            Assert.True(resultB.Equals(resultNode));
+            Assert.True(resultC.Equals(resultNode));
+            Assert.True(resultD.Equals(resultNode));
         }
 
     }
