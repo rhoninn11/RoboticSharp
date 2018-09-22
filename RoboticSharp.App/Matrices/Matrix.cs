@@ -88,17 +88,17 @@ namespace RoboticSharp.App.Matrices
         /// <summary>
         /// Macierz * wektor
         /// </summary>
-        public static List<double> operator *(Matrix m, List<double> v)
+        public static List<Symbol> operator *(Matrix m, List<Symbol> v)
         {
-            List<double> vector = new List<double>();
+            List<Symbol> vector = new List<Symbol>();
             int size = m.data.GetLength(0);
-            double element;
+            Symbol element;
             for (int i = 0; i < size; i++)
             {
-                element = 0;
+                element = new Symbol(0);
                 for (int j = 0; j < size; j++)
                 {
-                    //element += m.data[size, j] * v[j]; // vektor też będzie musiał się składać z symboli
+                    element += m.data[size, j] * v[j]; 
                 }
                 vector.Add(element);
             }
