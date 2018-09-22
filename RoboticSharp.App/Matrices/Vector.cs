@@ -32,7 +32,7 @@ namespace RoboticSharp.App.Matrices
         {
             Symbol[] arr = new Symbol[3];
             arr[0] = a._2 * b._3 - a._3 * b._2;
-            arr[1] = (-1) * (a._1 * b._3 - a._3 * b._1);
+            arr[1] = new Symbol(-1) * (a._1 * b._3 - a._3 * b._1);
             arr[2] = a._1 * b._2 - a._2 * b._1;
             return new Vector(arr);
         }

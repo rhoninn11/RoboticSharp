@@ -75,8 +75,10 @@ namespace RoboticSharp.App
                 if (noded.isOperatorTypeOf(SymbolOperator.plus))
                     symbol.subSymbols = noded.stackSubsymbolsWith(notNoded);
                 else
-                    for (int i = 0; i < noded.subSymbols.Count; i++)
-                        symbol.subSymbols.Add(noded.subSymbols[i] + notNoded);
+                {
+                    symbol.subSymbols.Add(s1);
+                    symbol.subSymbols.Add(s2);
+                }
             }
             else
             {
@@ -86,6 +88,28 @@ namespace RoboticSharp.App
             }
             ClearNode(symbol);
             SortNode(symbol);
+            return symbol;
+        }
+
+        public static Symbol operator -(Symbol s1, Symbol s2)
+        {
+            Symbol symbol = new Symbol();
+            symbol.operation = SymbolOperator.plus;
+
+            if(bothAreNumerical(s1, s2))
+            {
+                symbol.type = SymbolType.numerical;
+                symbol.numericValue = s1.numericValue - s2.numericValue;
+            }
+            else if(oneOfThemIsNode(s1, s2))
+            {
+                symbol.type = SymbolType.node;
+                Symbol noded = getNodedFrom(s1, s2);
+                Symbol notnoded = getNotNodedFrom(s1, s2);
+
+                if (noded.isOperatorTypeOf(SymbolOperator.minus))
+                    symbol.subSymbols = noded.stackSubsymbolsWith(notnoded);
+            }
             return symbol;
         }
         static Symbol getNodedFrom(Symbol s1, Symbol s2)
@@ -128,7 +152,6 @@ namespace RoboticSharp.App
             foreach (var symbol in this.subSymbols)
                 stackedSubSymbols.Add(symbol);
             stackedSubSymbols.Add(notNoded);
-            //subSymbols.Add(notNoded);// to rozwiązanie działą prawidłowo z powdu referencyjnego typu: modyfikuje poprzedni symbol 
             return stackedSubSymbols;
         }
         bool isOperatorTypeOf(SymbolOperator operat)
