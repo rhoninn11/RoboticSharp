@@ -8,6 +8,7 @@ namespace RoboticSharp.App.Matrices
     public class Matrix
     {
         Symbol[,] data; // pierwszy indeks jest wierszem
+        
         public Matrix()
         {
             data = new Symbol[4, 4];

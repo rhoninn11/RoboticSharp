@@ -14,7 +14,7 @@ namespace RoboticSharp.App
             //test mnożenia
             Matrix t1 = new Matrix(new Symbol("q1"), new Symbol(90), new Symbol(0), new Symbol(0));
             Matrix t2 = new Matrix(new Symbol("q2"), new Symbol(90), new Symbol(0), new Symbol(0));
-            Matrix t3 = t1.TranspozycjaMacierzT();
+            Matrix t3 = t1.TranspozycjaMacierz();
 
             Console.WriteLine("===================");
             Console.WriteLine(t1.ToString());

@@ -5,7 +5,7 @@ using System.Text;
 //40 max w funkcji
 namespace RoboticSharp.App
 {
-    public class Symbol
+    public class Symbol : IComparable<Symbol>
     {
         List<Symbol> subSymbols;
         double numericValue;
@@ -85,6 +85,7 @@ namespace RoboticSharp.App
                 symbol.subSymbols.Add(s2);
             }
             ClearNode(symbol);
+            SortNode(symbol);
             return symbol;
         }
         static Symbol getNodedFrom(Symbol s1, Symbol s2)
@@ -105,6 +106,10 @@ namespace RoboticSharp.App
         {
             return this.type == SymbolType.numerical;
         }
+        public bool isText()
+        {
+            return this.type == SymbolType.text;
+        }
         public bool isNode()
         {
             return this.type == SymbolType.node;
@@ -120,7 +125,7 @@ namespace RoboticSharp.App
         public List<Symbol> stackSubsymbolsWith(Symbol notNoded) // można wymyślić jakąś ładniejszą nazwę która by więcej mówiła o tym
         {
             List<Symbol> stackedSubSymbols = new List<Symbol>();
-            foreach(var symbol in this.subSymbols)
+            foreach (var symbol in this.subSymbols)
                 stackedSubSymbols.Add(symbol);
             stackedSubSymbols.Add(notNoded);
             //subSymbols.Add(notNoded);// to rozwiązanie działą prawidłowo z powdu referencyjnego typu: modyfikuje poprzedni symbol 
@@ -160,6 +165,7 @@ namespace RoboticSharp.App
                 symbol.subSymbols.Add(s2);
             }
             ClearNode(symbol);
+            SortNode(symbol);
             return symbol;
         }
 
@@ -210,6 +216,11 @@ namespace RoboticSharp.App
                     symbol.subSymbols.RemoveAll(s => s.isNumerical() && s.numericValue == 1);
                     break;
             }
+        }
+
+        public static void SortNode(Symbol symbol)
+        {
+            symbol.subSymbols.Sort();
         }
 
         public override String ToString()
@@ -295,7 +306,6 @@ namespace RoboticSharp.App
             return isNodesEqual;
         }
 
-
         public static Symbol Sin(Symbol input)
         {
             Symbol symbol = new Symbol();
@@ -336,6 +346,28 @@ namespace RoboticSharp.App
             value = value > -0.0001 && value < 0.0001 ? 0 : value;
             value = value > -1.0001 && value < -0.9999 ? -1 : value;
             return value;
+        }
+
+        public int CompareTo(Symbol other)
+        {
+            if (this.isNumerical() && !IsTheSameTypeSymbols(this, other))
+                return -1;
+            else if(other.isNumerical() && !IsTheSameTypeSymbols(this, other))
+                return 1;
+            else if (this.isNumerical() && IsTheSameTypeSymbols(this, other))
+                return this.numericValue.CompareTo(other.numericValue);
+
+            if(this.isText() && !IsTheSameTypeSymbols(this, other))
+                return -1;
+            else if(other.isText() && !IsTheSameTypeSymbols(this, other))
+                return 1;
+            else if (this.isText() && IsTheSameTypeSymbols(this, other))
+                return this.textValue.CompareTo(other.textValue);
+
+            else if (this.isNode() && IsTheSameValueSymbol(this, other))
+                return this.ToString().Length.CompareTo(other.ToString().Length);
+
+            return 0;
         }
     }
 }

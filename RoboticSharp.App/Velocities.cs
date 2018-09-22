@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using RoboticSharp.App.Matrices
+using RoboticSharp.App.Matrices;
 
 namespace RoboticSharp.App
 {
