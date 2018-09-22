@@ -30,7 +30,6 @@ namespace RoboticSharp.App
             Symbol[] baseSpeed = { new Symbol(0), new Symbol(0), new Symbol(0) };
             jointsAngularSpeeds[0] = new Vector(baseSpeed);
             jointsLinearSpeeds[0] = new Vector(baseSpeed);
-
         }
 
         void angularVelocityRecursion()
