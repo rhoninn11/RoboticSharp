@@ -139,7 +139,7 @@ namespace RoboticSharp.App
                 Symbol noded = getNodedFrom(s1, s2);
                 Symbol notnoded = getNotNodedFrom(s1, s2);
 
-                if (noded.isOperatorTypeOf(SymbolOperator.minus))
+                if (noded.isOperatorTypeOf(SymbolOperator.plus))
                     symbol.subSymbols = noded.stackSubsymbolsWith(notnoded);
             }
             return symbol;
