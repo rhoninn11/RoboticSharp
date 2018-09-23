@@ -130,8 +130,9 @@ namespace RoboticSharp.App
         }
         public static Symbol operator -(Symbol s1, Symbol s2)
         {
-            Symbol symbol = s1 + s2;
-            return -symbol;
+
+            Symbol symbol = s1 + -s2;
+            return symbol;
         }
 
         private static void MergeNodeSymbolsToOne(Symbol s1, Symbol s2, ref Symbol mergedTo, SymbolOperator operation)

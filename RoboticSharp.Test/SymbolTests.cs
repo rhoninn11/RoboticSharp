@@ -17,6 +17,27 @@ namespace RoboticSharp.Test
         }
 
         [Theory]
+        [MemberData(nameof(SymbolSubstractionTheoryData))]
+        public void SymbolSubstractionTest(Symbol s1, Symbol s2, string expected)
+        {
+            Symbol result = s1 - s2;
+            Assert.Equal(expected, result.ToString());
+        }
+
+        public static IEnumerable<object[]> SymbolSubstractionTheoryData()
+        {
+            return new List<object[]>()
+            {
+                new object[]{new Symbol(3), new Symbol(4), "-1,0000"},
+                new object[]{new Symbol(2), new Symbol("3"), "-1"}, // czy na razie zostawiamy ten wynik tak jak jest? czyli 2,0000 -3?
+                new object[]{new Symbol("a"), new Symbol("c"), "(a-c)"},
+                new object[]{new Symbol(2), new Symbol("c"), "(2,0000-c)"},
+                new object[]{new Symbol("a"), new Symbol(2), "(-2,0000+a)"}, //to chyba spowodowane sortowaniem
+                new object[]{new Symbol("a"), new Symbol("2"), "(-2+a)"},
+            };
+        }
+
+        [Theory]
         [MemberData(nameof(SymbolEqualityTheoryData))]
         public void SymbolEqualityTheory(Symbol a, Symbol b, bool c)
         {
