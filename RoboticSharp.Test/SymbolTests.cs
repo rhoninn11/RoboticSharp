@@ -15,7 +15,7 @@ namespace RoboticSharp.Test
             Symbol result = s1 + s2;
             Assert.Equal("9.0000", result.ToString());
         }
-  
+
         [Theory]
         [MemberData(nameof(SymbolEqualityTheoryData))]
         public void SymbolEqualityTheory(Symbol a, Symbol b, bool c)
@@ -101,7 +101,7 @@ namespace RoboticSharp.Test
         [Fact]
         public void NodeSubSymbolSortingForMultiplicationTest()
         {
-        //Given
+            //Given
             var symbolA = new Symbol(new List<Symbol>() { new Symbol("a"), new Symbol(1) }, Symbol.SymbolOperator.times);
             var symbolB = new Symbol(new List<Symbol>() { new Symbol(2), new Symbol("ab") }, Symbol.SymbolOperator.times);
             var symbolC = new Symbol("c");
@@ -134,6 +134,26 @@ namespace RoboticSharp.Test
             Assert.True(resultB.Equals(resultNode));
             Assert.True(resultC.Equals(resultNode));
             Assert.True(resultD.Equals(resultNode));
+        }
+
+        [Fact]
+        public void RemoveSingularValueFromSymbolNodes()
+        {
+            //Given
+            var symbolA = new Symbol(1);
+            var symbolB = new Symbol("b");
+            var symbolC = new Symbol(-1);
+
+            var resultSymbolA = new Symbol("b");
+            var resultSymbolB = new Symbol(0);
+
+            //When
+            var resultA = symbolA + symbolB + symbolC;
+            var resultB = symbolA + symbolC;
+
+            //Then
+            Assert.True(resultA.Equals(resultSymbolA));
+            Assert.True(resultB.Equals(resultSymbolB));
         }
 
     }
