@@ -137,7 +137,7 @@ namespace RoboticSharp.Test
         }
 
         [Fact]
-        public void RemoveSingularValueFromSymbolNodes()
+        public void RemoveSingularValueFromSymbolNodesAditionTest()
         {
             //Given
             var symbolA = new Symbol(1);
@@ -154,6 +154,40 @@ namespace RoboticSharp.Test
             //Then
             Assert.True(resultA.Equals(resultSymbolA));
             Assert.True(resultB.Equals(resultSymbolB));
+        }
+
+        [Fact]
+        public void RemoveSingularValueFromSymbolNodesMultiplicationTest()
+        {
+            //Given
+            var symbolA = new Symbol(12);
+            var symbolB = new Symbol("b");
+            var symbolC = new Symbol(1);
+            var symbolD = new Symbol(-1);
+            var symbolE = new Symbol("a");
+
+            var resultSymbolA = new Symbol(new List<Symbol>(){
+                    new Symbol(12),
+                    new Symbol("b")
+                }, Symbol.SymbolOperator.times);
+            var resultSymbolB = -new Symbol(new List<Symbol>(){
+                    new Symbol(12),
+                    new Symbol("b")
+                }, Symbol.SymbolOperator.times);
+            var resultSymbolC = -new Symbol(new List<Symbol>(){
+                    new Symbol("a"),
+                    new Symbol("b")
+                }, Symbol.SymbolOperator.times);
+
+            //When
+            var resultA = symbolB * symbolC * symbolA;
+            var resultB = symbolB * symbolA * symbolD;
+            var resultC = symbolB * symbolE * symbolD;
+
+            //Then
+            Assert.True(resultA.Equals(resultSymbolA));
+            Assert.True(resultB.Equals(resultSymbolB));
+            Assert.True(resultC.Equals(resultSymbolC));
         }
 
     }

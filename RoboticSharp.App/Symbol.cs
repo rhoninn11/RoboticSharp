@@ -214,21 +214,20 @@ namespace RoboticSharp.App
 
         public static Symbol operator -(Symbol s1)
         {
+            ChangePolarity(ref s1);
             if (s1.isNumerical())
-            {
                 s1.numericValue = -s1.numericValue;
-                return s1;
-            }
-            else if(s1.isText() || s1.isNode())
-            {
-                if (s1.isPolarityPositive())
-                    s1.polarity = SymbolPolarity.negative;
-                else if(s1.isPolarityNegative())
-                    s1.polarity = SymbolPolarity.positive;
-                return s1;
-            }
-            return null;//na razie nie ma przewidzianych innych przypadków nie te także to nie wystąpi
+            return s1;
         }
+
+        private static void ChangePolarity(ref Symbol s1)
+        {
+            if (s1.isPolarityPositive())
+                s1.polarity = SymbolPolarity.negative;
+            else if (s1.isPolarityNegative())
+                s1.polarity = SymbolPolarity.positive;
+        }
+
         bool isPolarityPositive() { return polarity == SymbolPolarity.positive; }
         bool isPolarityNegative() { return polarity == SymbolPolarity.negative; }
 
@@ -239,7 +238,7 @@ namespace RoboticSharp.App
 
             numericalCalculationInsideNode(ref symbol);
             removeSingularValuesFromNode(ref symbol);
-            noneOrSingleBranchNodeFix(ref symbol);
+            NoneOrSingleBranchNodeFix(ref symbol);
         }
         public static void numericalCalculationInsideNode(ref Symbol symbol) // jak masz pomysł na lepszą nazwę to dawaj:D
         {
@@ -275,31 +274,63 @@ namespace RoboticSharp.App
         }
         public static void removeSingularValuesFromNode(ref Symbol symbol)
         {
+            Predicate<Symbol> symbolIsZero = s => s.isNumerical() && s.numericValue == 0;
+            Predicate<Symbol> symbolIsOne = s => s.isNumerical() && s.numericValue == 1;
+            Predicate<Symbol> symbolIsMinusOne = s => s.isNumerical() && s.numericValue == -1;
             switch (symbol.operation)
             {
                 case SymbolOperator.plus:
-                    symbol.subSymbols.RemoveAll(s => s.isNumerical() && s.numericValue == 0);
+                    symbol.subSymbols.RemoveAll(symbolIsZero);
                     break;
                 case SymbolOperator.times:
-                    if (symbol.subSymbols.Exists(s => s.isNumerical() && s.numericValue == 0))
+                    if (symbol.subSymbols.Exists(symbolIsZero))
                     {
-                        symbol.subSymbols.Clear();
-                        symbol.type = SymbolType.numerical;
-                        symbol.operation = SymbolOperator.none;
-                        symbol.polarity = SymbolPolarity.positive;
-                        symbol.numericValue = 0;
+                        symbol = new Symbol(0);
+                        return;
                     }
-                    symbol.subSymbols.RemoveAll(s => s.isNumerical() && s.numericValue == 1);
+
+                    if (symbol.subSymbols.Exists(symbolIsOne))
+                        symbol.subSymbols.RemoveAll(symbolIsOne);
+
+                    if (symbol.subSymbols.Exists(symbolIsMinusOne))
+                    {
+                        int countOfMinusOneSymbols = symbol.subSymbols.RemoveAll(symbolIsMinusOne);
+                        if (countOfMinusOneSymbols % 2 == 1)
+                            ChangePolarity(ref symbol);
+                    }
                     break;
             }
-        }
-        public static void noneOrSingleBranchNodeFix(ref Symbol symbol)
-        {
 
+        }
+
+        private static Symbol RecoverEmptyNode(ref Symbol symbol)
+        {
+            switch (symbol.operation)
+            {
+                case SymbolOperator.plus:
+                    symbol = new Symbol(0);
+                    break;
+                case SymbolOperator.times:
+                    symbol.type = SymbolType.numerical;
+                    symbol.operation = SymbolOperator.none;
+                    if (symbol.isPolarityPositive())
+                        symbol.numericValue = 1;
+                    else if (symbol.isPolarityPositive())
+                        symbol.numericValue = -1;
+                    break;
+            }
+
+            return symbol;
+        }
+
+        public static void NoneOrSingleBranchNodeFix(ref Symbol symbol)
+        {
+            if (!symbol.isNode())
+                return;
             if (symbol.subSymbols.Count == 1)
                 symbol = symbol.subSymbols[0];
             else if (symbol.subSymbols.Count == 0)
-                symbol = new Symbol();
+                RecoverEmptyNode(ref symbol);
         }
         public static void SortNode(Symbol symbol) { symbol.subSymbols.Sort(); }
 
