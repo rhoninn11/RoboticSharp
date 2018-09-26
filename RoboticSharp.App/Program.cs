@@ -7,6 +7,7 @@ namespace RoboticSharp.App
     {
         static void Main(string[] args)
         {
+            Symbol s3 = new Symbol(2) * new Symbol("3");
             //test konstrukcyjny
             Matrix t = new Matrix(new Symbol(90), new Symbol(0), new Symbol(0), new Symbol(0));
             Console.WriteLine(t.ToString());

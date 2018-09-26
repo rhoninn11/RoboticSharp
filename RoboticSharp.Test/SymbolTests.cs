@@ -28,12 +28,14 @@ namespace RoboticSharp.Test
         {
             return new List<object[]>()
             {
-                new object[]{new Symbol(3), new Symbol(4), "-1,0000"},
+                new object[]{new Symbol(3), new Symbol(4), "-1.0000"},
                 new object[]{new Symbol(2), new Symbol("3"), "-1"}, // czy na razie zostawiamy ten wynik tak jak jest? czyli 2,0000 -3?
                 new object[]{new Symbol("a"), new Symbol("c"), "(a-c)"},
-                new object[]{new Symbol(2), new Symbol("c"), "(2,0000-c)"},
-                new object[]{new Symbol("a"), new Symbol(2), "(-2,0000+a)"}, //to chyba spowodowane sortowaniem
+                new object[]{new Symbol(2), new Symbol("c"), "(2.0000-c)"},
+                new object[]{new Symbol("a"), new Symbol(2), "(-2.0000+a)"},
                 new object[]{new Symbol("a"), new Symbol("2"), "(-2+a)"},
+                new object[]{new Symbol(1)* new Symbol("3"), new Symbol("k")*new Symbol("0"), "(3-(0*k))"},
+                new object[]{new Symbol(1)*new Symbol(0), new Symbol(2)*new Symbol("0"), "-(2.0000*0)"}
             };
         }
 
@@ -77,6 +79,30 @@ namespace RoboticSharp.Test
                 new object[]{ new Symbol(new List<Symbol>(){new Symbol(1),new Symbol(2),new Symbol(3)},Symbol.SymbolOperator.times),new Symbol(new List<Symbol>(){new Symbol(1),new Symbol(2),new Symbol(3)},Symbol.SymbolOperator.times),true}
             };
         }
+
+        [Theory]
+        [MemberData(nameof(SymbolMultiplicationTheoryData))]
+        public void SymbolMultiplicationTest(Symbol s1, Symbol s2, string result)
+        {
+            Symbol s3 = s1 * s2;
+            Assert.Equal(result, s3.ToString());
+        }
+        public static IEnumerable<object[]> SymbolMultiplicationTheoryData()
+        {
+            return new List<object[]>()
+            {
+                new object[]{new Symbol(2), new Symbol(3), "6.0000"},
+                new object[]{new Symbol("2"), new Symbol(4), "(4.0000*2)"},
+                new object[]{new Symbol("k"), new Symbol(0), "0.0000"},
+                new object[]{new Symbol("k"), new Symbol("0"), "0"},
+                new object[] {(new Symbol(2)*new Symbol(3)), new Symbol(2), "12.0000"},
+                new object[]{new Symbol("2")*new Symbol(4), new Symbol(2), "(8.0000*2)"},
+                new object[]{new Symbol("2")*new Symbol(4), new Symbol("o"), "(4.0000*2*o)"},
+                new object[]{new Symbol("2")*new Symbol(4), new Symbol("o")*new Symbol(3), "(12.0000*2*o)"},
+                new object[]{new Symbol(-1), (new Symbol(1)*new Symbol("3") - new Symbol("k")*new Symbol("0")), "-(3-(0*k))"},
+            };
+        }
+
 
         [Fact]
         public void NodeSubSymbolSortingForAditionTest()

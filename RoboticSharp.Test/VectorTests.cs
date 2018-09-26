@@ -26,13 +26,13 @@ namespace RoboticSharp.Test
                 {
                     new Symbol[] { new Symbol(1), new Symbol(2), new Symbol(3) },
                     new Symbol[] { new Symbol(0), new Symbol(0), new Symbol(3) },
-                    "[6,0000, -3,0000, 0,0000]",
+                    "[6.0000, -3.0000, 0.0000]",
                 },
                 new object[]
                 {
                    new Symbol[] { new Symbol(1), new Symbol(2), new Symbol("k") },
                    new Symbol[] { new Symbol("0"), new Symbol(0), new Symbol("3") },    //drugi element powstalego wektora nie za bardzo się zgadza,
-                   "[6,0000, -3,0000, -6,0000]",                                        // trzeci w sumie też, coś może być nie tak z mnożeniem symboli
+                   "[6.0000, -3.0000, -6.0000]",                                        // trzeci w sumie też, coś może być nie tak z mnożeniem symboli
                 }
             };
         }
@@ -52,7 +52,11 @@ namespace RoboticSharp.Test
         {
             return new List<object[]>()
             {
-                new object[] {new App.Symbol[] { new App.Symbol(1), new App.Symbol(2), new App.Symbol(0) } , new App.Symbol[] { new App.Symbol("k"), new App.Symbol("0"), new App.Symbol("0") }, "[(1,0000+k), (2,0000+0), 0]" }
+                new object[] {
+                    new App.Symbol[] { new App.Symbol(1), new App.Symbol(2), new App.Symbol(0) },
+                    new App.Symbol[] { new App.Symbol("k"), new App.Symbol("0"), new App.Symbol("0") },
+                    "[(1.0000+k), (2.0000+0), 0]"
+                }
             };
         }
     }
