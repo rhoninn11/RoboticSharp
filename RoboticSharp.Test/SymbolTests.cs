@@ -7,41 +7,9 @@ namespace RoboticSharp.Test
 {
     public class SymbolTests
     {
-        [Fact]
-        public void SymbolAdditionTest()
-        {
-            Symbol s1 = new Symbol(4);
-            Symbol s2 = new Symbol(5);
-            Symbol result = s1 + s2;
-            Assert.Equal("9.0000", result.ToString());
-        }
-
         [Theory]
-        [MemberData(nameof(SymbolSubstractionTheoryData))]
-        public void SymbolSubstractionTest(Symbol s1, Symbol s2, string expected)
-        {
-            Symbol result = s1 - s2;
-            Assert.Equal(expected, result.ToString());
-        }
-
-        public static IEnumerable<object[]> SymbolSubstractionTheoryData()
-        {
-            return new List<object[]>()
-            {
-                new object[]{new Symbol(3), new Symbol(4), "-1.0000"},
-                new object[]{new Symbol(2), new Symbol("3"), "-1"}, // czy na razie zostawiamy ten wynik tak jak jest? czyli 2,0000 -3?
-                new object[]{new Symbol("a"), new Symbol("c"), "(a-c)"},
-                new object[]{new Symbol(2), new Symbol("c"), "(2.0000-c)"},
-                new object[]{new Symbol("a"), new Symbol(2), "(-2.0000+a)"},
-                new object[]{new Symbol("a"), new Symbol("2"), "(-2+a)"},
-                new object[]{new Symbol(1)* new Symbol("3"), new Symbol("k")*new Symbol("0"), "(3-(0*k))"},
-                new object[]{new Symbol(1)*new Symbol(0), new Symbol(2)*new Symbol("0"), "-(2.0000*0)"}
-            };
-        }
-
-        [Theory]
-        [MemberData(nameof(SymbolEqualityTheoryData))]
-        public void SymbolEqualityTheory(Symbol a, Symbol b, bool c)
+        [MemberData(nameof(SymbolEquality_Test_Data))]
+        public void SymbolEquality_Test(Symbol a, Symbol b, bool c)
         {
             //act
             var resultA = a.Equals(b);
@@ -52,9 +20,7 @@ namespace RoboticSharp.Test
             Assert.True(resultB == c);
             Assert.True(resultB == resultA);
         }
-
-
-        public static IEnumerable<object[]> SymbolEqualityTheoryData()
+        public static IEnumerable<object[]> SymbolEquality_Test_Data()
         {
             return new List<object[]>(){
                 new object[]{ new Symbol(1),new Symbol(1),true},
@@ -80,32 +46,8 @@ namespace RoboticSharp.Test
             };
         }
 
-        [Theory]
-        [MemberData(nameof(SymbolMultiplicationTheoryData))]
-        public void SymbolMultiplicationTest(Symbol s1, Symbol s2, string result)
-        {
-            Symbol s3 = s1 * s2;
-            Assert.Equal(result, s3.ToString());
-        }
-        public static IEnumerable<object[]> SymbolMultiplicationTheoryData()
-        {
-            return new List<object[]>()
-            {
-                new object[]{new Symbol(2), new Symbol(3), "6.0000"},
-                new object[]{new Symbol("2"), new Symbol(4), "(4.0000*2)"},
-                new object[]{new Symbol("k"), new Symbol(0), "0.0000"},
-                new object[]{new Symbol("k"), new Symbol("0"), "0"},
-                new object[] {(new Symbol(2)*new Symbol(3)), new Symbol(2), "12.0000"},
-                new object[]{new Symbol("2")*new Symbol(4), new Symbol(2), "(8.0000*2)"},
-                new object[]{new Symbol("2")*new Symbol(4), new Symbol("o"), "(4.0000*2*o)"},
-                new object[]{new Symbol("2")*new Symbol(4), new Symbol("o")*new Symbol(3), "(12.0000*2*o)"},
-                new object[]{new Symbol(-1), (new Symbol(1)*new Symbol("3") - new Symbol("k")*new Symbol("0")), "-(3-(0*k))"},
-            };
-        }
-
-
         [Fact]
-        public void NodeSubSymbolSortingForAditionTest()
+        public void NodeSubSymbolSorting_Test_ForAdition()
         {
             //Given
             var symbolA = new Symbol(new List<Symbol>() { new Symbol("a"), new Symbol(1) }, Symbol.SymbolOperator.times);
@@ -144,9 +86,8 @@ namespace RoboticSharp.Test
             Assert.True(resultC.Equals(resultNode));
             Assert.True(resultD.Equals(resultNode));
         }
-
         [Fact]
-        public void NodeSubSymbolSortingForMultiplicationTest()
+        public void NodeSubSymbolSorting_Test_ForMultiplication()
         {
             //Given
             var symbolA = new Symbol(new List<Symbol>() { new Symbol("a"), new Symbol(1) }, Symbol.SymbolOperator.times);
@@ -182,6 +123,227 @@ namespace RoboticSharp.Test
             Assert.True(resultC.Equals(resultNode));
             Assert.True(resultD.Equals(resultNode));
         }
+
+        [Fact]
+        public void ColapseEmptyNodeToSymbol_Test()
+        {
+            //Given
+            var symbolA = new Symbol(new List<Symbol>() { }, Symbol.SymbolOperator.plus);
+
+            var resultSymbol = new Symbol(0);
+
+            //when
+            Symbol.ColapseEmptyNodeToSymbol(ref symbolA);
+
+            //Then
+            Assert.True(symbolA.Equals(resultSymbol));
+        }
+        [Fact]
+        public void ColapseOneBranchNodeToSymbol_Test()
+        {
+            //Given
+            var symbolA = new Symbol(new List<Symbol>() { new Symbol(1) }, Symbol.SymbolOperator.plus);
+            var symbolB = -new Symbol(new List<Symbol>() { new Symbol(1) }, Symbol.SymbolOperator.plus);
+            var symbolC = new Symbol(new List<Symbol>() { -new Symbol(1) }, Symbol.SymbolOperator.plus);
+            var symbolD = -new Symbol(new List<Symbol>() { -new Symbol(1) }, Symbol.SymbolOperator.plus);
+            var resultSymbolA = new Symbol(1);
+            var resultSymbolB = new Symbol(-1);
+            var resultSymbolC = new Symbol(-1);
+            var resultSymbolD = new Symbol(1);
+
+            //When
+            Symbol.ColapseOneBranchNodeToSymbol(ref symbolA);
+            Symbol.ColapseOneBranchNodeToSymbol(ref symbolB);
+            Symbol.ColapseOneBranchNodeToSymbol(ref symbolC);
+            Symbol.ColapseOneBranchNodeToSymbol(ref symbolD);
+
+            //Then
+            Assert.True(symbolA.Equals(resultSymbolA));
+            Assert.True(symbolB.Equals(resultSymbolB));
+            Assert.True(symbolC.Equals(resultSymbolC));
+            Assert.True(symbolD.Equals(resultSymbolD));
+        }
+
+
+        [Fact]
+        public void SymbolAddition_Test()
+        {
+            var symbolA = new Symbol(4) + new Symbol(5);
+            var resultSymbolA = new Symbol(9);
+            Assert.True(symbolA.Equals(resultSymbolA));
+        }
+
+        [Theory]
+        [MemberData(nameof(SymbolSubstraction_Test_Data))]
+        public void SymbolSubstraction_Test(Symbol s1, Symbol s2, Symbol expected)
+        {
+            var result = s1 - s2;
+            Assert.True(result.Equals(expected));
+        }
+        public static IEnumerable<object[]> SymbolSubstraction_Test_Data()
+        {
+            return new List<object[]>()
+            {
+                new object[]{new Symbol(3), new Symbol(4), new Symbol(-1)},
+                new object[]{new Symbol(2), new Symbol(3), new Symbol(-1)}, // czy na razie zostawiamy ten wynik tak jak jest? czyli 2,0000 -3?
+                new object[]{
+                    new Symbol("a"),
+                    new Symbol("c"),
+                    new Symbol(
+                        new List<Symbol>(){
+                            new Symbol("a"),
+                            -new Symbol("c")
+                        },Symbol.SymbolOperator.plus)
+                },
+                new object[]{
+                    new Symbol(2),
+                    new Symbol("c"),
+                    new Symbol(
+                        new List<Symbol>(){
+                            new Symbol(2),
+                            -new Symbol("c")
+                        },Symbol.SymbolOperator.plus)
+                },
+                new object[]{
+                    new Symbol("a"),
+                    new Symbol(2),
+                    new Symbol(
+                        new List<Symbol>(){
+                            new Symbol(-2),
+                            new Symbol("a")
+                        },Symbol.SymbolOperator.plus)
+                },
+                new object[]{
+                    new Symbol("a"),
+                    new Symbol(2),
+                    new Symbol(
+                        new List<Symbol>(){
+                            new Symbol(-2),
+                            new Symbol("a")
+                        },Symbol.SymbolOperator.plus)
+                },
+                new object[]{
+                    new Symbol(1) * new Symbol(3),
+                    new Symbol("k") * new Symbol(0),
+                    new Symbol(3)
+                },
+                new object[]{
+                    new Symbol(1) * new Symbol(0),
+                    new Symbol(2) * new Symbol(3),
+                    new Symbol(-6)
+                }
+            };
+        }
+
+
+        [Theory]
+        [MemberData(nameof(SymbolMultiplication_Test_Data))]
+        public void SymbolMultiplication_Test(Symbol s1, Symbol s2, Symbol result)
+        {
+            Symbol s3 = s1 * s2;
+            Assert.True(s3.Equals(result));
+        }
+        public static IEnumerable<object[]> SymbolMultiplication_Test_Data()
+        {
+            return new List<object[]>()
+            {
+                new object[]{
+                    new Symbol(2),
+                    new Symbol(3),
+                    new Symbol(6)
+                },
+                new object[]{
+                    new Symbol("k"),
+                    new Symbol(4),
+                    new Symbol(new List<Symbol>{
+                        new Symbol(4),
+                        new Symbol("k")
+                    },Symbol.SymbolOperator.times)
+                },
+                new object[]{
+                    new Symbol("k"),
+                    new Symbol(0),
+                    new Symbol(0)
+                },
+                new object[]{
+                    new Symbol(new List<Symbol>{
+                        new Symbol(2),
+                        new Symbol(3)
+                    },Symbol.SymbolOperator.times),
+                    new Symbol(2),
+                    new Symbol(12)
+                },
+                new object[]{
+                    new Symbol(new List<Symbol>{
+                        new Symbol(2),
+                        new Symbol(4)
+                    },Symbol.SymbolOperator.times),
+                    new Symbol(2),
+                    new Symbol(16)
+                },
+                new object[]{
+                    new Symbol(new List<Symbol>{
+                        new Symbol(2),
+                        new Symbol(4)
+                    },Symbol.SymbolOperator.times),
+                    new Symbol("a"),
+                    new Symbol(new List<Symbol>{
+                        new Symbol(8),
+                        new Symbol("a")
+                    },Symbol.SymbolOperator.times),
+                },
+                new object[]{
+                    new Symbol(new List<Symbol>{
+                        new Symbol("a"),
+                        new Symbol(4)
+                    },Symbol.SymbolOperator.times),
+                    new Symbol(new List<Symbol>{
+                        new Symbol("b"),
+                        new Symbol(3)
+                    },Symbol.SymbolOperator.times),
+                    new Symbol(new List<Symbol>{
+                        new Symbol(12),
+                        new Symbol("a"),
+                        new Symbol("b")
+                    },Symbol.SymbolOperator.times),
+                }
+            };
+        }
+
+        [Fact]
+        public void RemoveSingularValuesFromNode_Test()
+        {
+            //Given
+            var symbolA = new Symbol(new List<Symbol> { new Symbol(1), new Symbol(0) }, Symbol.SymbolOperator.plus);
+            var symbolB = new Symbol(new List<Symbol> { new Symbol(0), new Symbol("a") }, Symbol.SymbolOperator.times);
+            var symbolC = new Symbol(new List<Symbol> { new Symbol(1), new Symbol("a") }, Symbol.SymbolOperator.times);
+            var symbolD = new Symbol(new List<Symbol> { new Symbol(-1), new Symbol("a") }, Symbol.SymbolOperator.times);
+            var symbolE = new Symbol(new List<Symbol> { new Symbol(-1), new Symbol(-1), new Symbol("a") }, Symbol.SymbolOperator.times);
+
+            var resultSymbolA = new Symbol(new List<Symbol> { new Symbol(1), }, Symbol.SymbolOperator.plus);
+            var resultSymbolB = new Symbol(0);
+            var resultSymbolC = new Symbol("a");
+            var resultSymbolD = -new Symbol("a");
+            var resultSymbolE = new Symbol("a");
+
+            //When
+            Symbol.RemoveSingularValuesFromNode(ref symbolA);
+            Symbol.RemoveSingularValuesFromNode(ref symbolB);
+            Symbol.RemoveSingularValuesFromNode(ref symbolC);
+            Symbol.NoneOrSingleBranchNodeFix(ref symbolC);
+            Symbol.RemoveSingularValuesFromNode(ref symbolD);
+            Symbol.NoneOrSingleBranchNodeFix(ref symbolD);
+            Symbol.RemoveSingularValuesFromNode(ref symbolE);
+            Symbol.NoneOrSingleBranchNodeFix(ref symbolE);
+
+            //Then
+            Assert.True(symbolA.Equals(resultSymbolA));
+            Assert.True(symbolB.Equals(resultSymbolB));
+            Assert.True(symbolC.Equals(resultSymbolC));
+            Assert.True(symbolD.Equals(resultSymbolD));
+            Assert.True(symbolE.Equals(resultSymbolE));
+        }
+
 
         [Fact]
         public void RemoveSingularValueFromSymbolNodesAditionTest()

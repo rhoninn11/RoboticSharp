@@ -124,8 +124,6 @@ namespace RoboticSharp.App
         public static Symbol operator -(Symbol s1)
         {
             ChangePolarity(ref s1);
-            if (s1.isNumerical())
-                s1.numericValue = -s1.numericValue;
             return s1;
         }
         public static Symbol operator -(Symbol s1, Symbol s2)
@@ -198,9 +196,16 @@ namespace RoboticSharp.App
         private static void ChangePolarity(ref Symbol s1)
         {
             if (s1.isPolarityPositive())
+            {
                 s1.polarity = SymbolPolarity.negative;
+            }
             else if (s1.isPolarityNegative())
+            {
                 s1.polarity = SymbolPolarity.positive;
+            }
+
+            if (s1.isNumerical())
+                s1.numericValue = -s1.numericValue;
         }
         private void ChangePolarity()
         {
@@ -278,32 +283,33 @@ namespace RoboticSharp.App
             Predicate<Symbol> symbolIsZero = s => s.isNumerical() && s.numericValue == 0;
             Predicate<Symbol> symbolIsOne = s => s.isNumerical() && s.numericValue == 1;
             Predicate<Symbol> symbolIsMinusOne = s => s.isNumerical() && s.numericValue == -1;
-            switch (symbol.operation)
+
+            if (symbol.isOperatorTypeOf(SymbolOperator.plus))
+                symbol.subSymbols.RemoveAll(symbolIsZero);
+            else if (symbol.isOperatorTypeOf(SymbolOperator.times))
             {
-                case SymbolOperator.plus:
-                    symbol.subSymbols.RemoveAll(symbolIsZero);
-                    break;
-                case SymbolOperator.times:
-                    if (symbol.subSymbols.Exists(symbolIsZero))
-                    {
-                        symbol = new Symbol(0);
-                        return;
-                    }
+                if (symbol.subSymbols.Exists(symbolIsZero))
+                {
+                    symbol = new Symbol(0);
+                    return;
+                }
 
-                    if (symbol.subSymbols.Exists(symbolIsOne))
-                        symbol.subSymbols.RemoveAll(symbolIsOne);
+                if (symbol.subSymbols.Exists(symbolIsOne))
+                    symbol.subSymbols.RemoveAll(symbolIsOne);
 
-                    if (symbol.subSymbols.Exists(symbolIsMinusOne))
-                    {
-                        int countOfMinusOneSymbols = symbol.subSymbols.RemoveAll(symbolIsMinusOne);
-                        if (countOfMinusOneSymbols % 2 == 1)
-                            ChangePolarity(ref symbol);
-                    }
-                    break;
+                if (symbol.subSymbols.Exists(symbolIsMinusOne))
+                {
+                    int countOfMinusOneSymbols = symbol.subSymbols.RemoveAll(symbolIsMinusOne);
+                    if (countOfMinusOneSymbols % 2 == 1)
+                        ChangePolarity(ref symbol);
+                }
             }
         }
         public static void NoneOrSingleBranchNodeFix(ref Symbol symbol)
         {
+            if(!symbol.isNode())
+                return;
+
             if (symbol.subSymbols.Count == 1)
                 ColapseOneBranchNodeToSymbol(ref symbol);
             else if (symbol.subSymbols.Count == 0)
@@ -311,7 +317,7 @@ namespace RoboticSharp.App
         }
         public static void ColapseOneBranchNodeToSymbol(ref Symbol symbol)
         {
-            if (!(symbol.subSymbols.Count == 1))
+            if (!(symbol.subSymbols.Count == 1) || !symbol.isNode())
                 return;
 
             var colapseTo = symbol.subSymbols[0];
@@ -327,22 +333,12 @@ namespace RoboticSharp.App
             }
             symbol = colapseTo;
         }
-        private static void ColapseEmptyNodeToSymbol(ref Symbol symbol)
+        public static void ColapseEmptyNodeToSymbol(ref Symbol symbol)
         {
-            if (!(symbol.subSymbols.Count == 0))
+            if (!(symbol.subSymbols.Count == 0) || !symbol.isNode())
                 return;
 
-            if (symbol.isOperatorTypeOf(SymbolOperator.plus))
-                symbol = new Symbol(0);
-            else if (symbol.isOperatorTypeOf(SymbolOperator.times))
-            {
-                symbol.type = SymbolType.numerical;
-                symbol.operation = SymbolOperator.none;
-                if (symbol.isPolarityPositive())
-                    symbol.numericValue = 1;
-                else if (symbol.isPolarityPositive())
-                    symbol.numericValue = -1;
-            }
+            symbol = new Symbol(0);
         }
 
         public static void SortNode(Symbol symbol) { symbol.subSymbols.Sort(); }
