@@ -1,2 +1,2 @@
 # RoboticSharp
-To jest nasze narzędzie do liczenia robotów
+Tool for symbolic-matrix equations
